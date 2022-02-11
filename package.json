@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "debug": "^4.3.3",
-    "dotenv": "^14.3.2",
+    "dotenv": "^16.0.0",
     "faker": "^6.6.6",
     "morgan": "^1.10.0",
     "nodemon": "^2.0.15"
