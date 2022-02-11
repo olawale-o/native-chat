@@ -11,6 +11,6 @@ app.use(cors());
 
 app.get('/', (req, res) => res.sendFile(__dirname + '/index.html'));
 
-app.use('/v1/api', require('../routes/auth'));
+app.use('/v1/api', [require('../routes/auth'), require('../routes/user')]);
 
 module.exports = app;
