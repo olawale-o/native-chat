@@ -1,5 +1,5 @@
 require('dotenv').config()
-const { PORT, MONGODB_USERNAME, MONGODB_PASSWORD, NODE_ENV, APP_NAME} = process.env;
+const { PORT, MONGODB_USERNAME, MONGODB_PASSWORD, NODE_ENV, APP_NAME, JWT_SECRET} = process.env;
 
 module.exports = {
   mongoOptions: {
@@ -14,4 +14,6 @@ module.exports = {
     NODE_ENV,
     APP_NAME,
   },
+
+  JWT_SECRET,
 };
