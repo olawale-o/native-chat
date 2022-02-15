@@ -8,7 +8,8 @@ const { JWT_SECRET } = require('../constants');
 passport.use('local-register', new LocalStrategy({
   usernameField: 'username',
   passwordField: 'password',
-}, async (username, password, done) => {
+  passReqToCallback: true,
+}, async (req, username, password, done) => {
   try {
     const user = await User.findOne({ username });
     if (user) {
@@ -17,9 +18,9 @@ passport.use('local-register', new LocalStrategy({
     const { email } = req.body;
     const newUser = await User.create({ username, password, email, });
     return done(null, newUser, { message: 'User created successfully',});
-    } catch (err) {
-      return done(null, false, { message: err.message, });
-    }
+  } catch (err) {
+    return done(null, false, { message: err.message, });
+  }
 }));
 
 passport.use('local-login', new LocalStrategy({
