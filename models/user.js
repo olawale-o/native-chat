@@ -1,5 +1,5 @@
-import mongoose from 'mongoose';
-
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 const { Schema } = mongoose;
 
 const userSchema = new Schema({
@@ -14,6 +14,7 @@ const userSchema = new Schema({
   minimun_fee: {type: Number},
   date_of_birth: {type: Date},
   profile_pic: {type: String},
+  online: {type: Boolean, default: false},
   created_at: {type: Date, default: Date.now},
   updated_at: {type: Date, default: Date.now}
 });
