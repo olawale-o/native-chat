@@ -22,6 +22,17 @@ router.post('/user', async function(req, res, next){
   });
 });
 
+router.get('/user/:email', async function(req, res, next) {
+  const { email } = req.params;
+  const user = await User.findOne({ email });
+  return res.status(200).json({
+    data: {
+      user,
+    },
+    success: true,
+  });
+});
+
 router.get('/user/follow', function(req, res, next){
   res.json({
     id: '1',
