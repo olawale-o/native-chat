@@ -2,6 +2,26 @@ const express = require('express');
 const router = express.Router();
 const User = require('../../models/user');
 
+router.post('/user', async function(req, res, next){
+  const { email, name, password } = req.body;
+  const user = await User.findOne({ email });
+  if (user) {
+    return res.status(200).json({
+      data: {
+        user,
+      },
+      success: true,
+    });
+  }
+  const newUser = await User.create({ email, username: name, password });
+  return res.status(200).json({
+    data: {
+      user: newUser,
+    },
+    success: true,
+  });
+});
+
 router.get('/user/follow', function(req, res, next){
   res.json({
     id: '1',
