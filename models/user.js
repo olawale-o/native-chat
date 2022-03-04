@@ -6,7 +6,7 @@ const userSchema = new Schema({
   first_name: {type: String},
   last_name: {type: String},
   username: {type: String, required: true, unique: true},
-  email: {type: String, required: true, unique: true},
+  email: {type: String},
   phone_no: {type: String},
   password: {type: String, required: true},
   interest: [{type: String}],
@@ -22,7 +22,8 @@ const userSchema = new Schema({
 userSchema.pre('save', async function(next) {
   const currentDate = new Date();
   const user = this;
-  const hash = await bcrypt.hashSync(this.password);
+  console.log('user', user);
+  const hash = await bcrypt.hashSync(this.password, 10);
   this.password = hash;
 
   this.updated_at = currentDate;
