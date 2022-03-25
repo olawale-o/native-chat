@@ -35,7 +35,6 @@ router.get('/:email', async function(req, res, next) {
 
 
 router.get('/:id/suggestion', async function(req, res, next){
-  console.log('hiiting');
   try {
     const { id } = req.params;
     const users = await User.find({ _id: { $ne: id } }).limit(10);
