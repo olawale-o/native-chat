@@ -20,7 +20,6 @@ const uri = NODE_ENV === 'development' ?
 'mongodb://localhost:27017/crime' :
 `mongodb+srv://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@cluster0.kr6st.mongodb.net/${APP_NAME}?retryWrites=true&w=majority`;
 
-
 connect(uri, mongoOptions).then(
   () => {
     server.listen(PORT || 3000, () => {
