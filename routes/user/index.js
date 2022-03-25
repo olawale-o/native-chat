@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../../models/user');
 
-router.post('/user', async function(req, res, next){
+router.post('/', async function(req, res, next){
   const { email, name, password } = req.body;
   const user = await User.findOne({ email });
   if (user) {
@@ -22,10 +22,10 @@ router.post('/user', async function(req, res, next){
   });
 });
 
-router.get('/user/:email', async function(req, res, next) {
+router.get('/:email', async function(req, res, next) {
   const { email } = req.params;
   const user = await User.findOne({ email });
-  return res.status(200).json({
+  res.status(200).json({
     data: {
       user,
     },
@@ -33,21 +33,20 @@ router.get('/user/:email', async function(req, res, next) {
   });
 });
 
-router.get('/user/follow', function(req, res, next){
-  res.json({
-    id: '1',
-    name: 'John Doe',
-    username: 'johndoe',
-  }).status(200);
 
-  next();
-});
-
-router.get('/user/all', async function(req, res, next){
-  console.log('get all users');
-  const users = await User.find({}).select('-password');
-  res.json({users,}).status(200);
-  next();
+router.get('/:id/suggestion', async function(req, res, next){
+  console.log('hiiting');
+  try {
+    const { id } = req.params;
+    const users = await User.find({ _id: { $ne: id } }).limit(10);
+    res.json({
+      users,
+      message: 'success',
+      success: true,
+    }).status(200);
+  } catch (err) {
+    res.json({ message: err.message, success: false });
+  }
 });
 
 module.exports = router;
