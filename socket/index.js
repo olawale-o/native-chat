@@ -3,6 +3,7 @@ const { MongoClient, ObjectId } = require('mongodb');
 const { MongoDBMessageStorage, InMemoryMessageStorage, RedisMessageStorage } = require('./messageStorage');
 const { InMemmoryStore, RedisSessionStorage } = require('./sessionStorage');
 const { LOCAL_MONGODB_SINGLESET } = require('../config');
+console.log(LOCAL_MONGODB_SINGLESET);
 const client = new MongoClient(LOCAL_MONGODB_SINGLESET);
 
 const memoryStorage = new InMemoryMessageStorage();

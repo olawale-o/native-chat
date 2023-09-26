@@ -23,7 +23,6 @@ const register = async (req, res, next) => {
 }
 
 const login = async (req, res, next) => {
-  console.log("login")
   try {
     const user = await UserService.login(req.body);
     return res.status(200).json({user,})

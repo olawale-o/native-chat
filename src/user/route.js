@@ -11,7 +11,6 @@ const Friend = client.db('socialdb').collection('friends');
 const handler = require('./handler');
 
 // module.exports = function() {
-  console.log('user routes')
 
   router.post('/', handler.register);
   
