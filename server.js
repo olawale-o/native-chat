@@ -1,4 +1,4 @@
-const { PORT } = require('./config');
+const { PORT, REDIS_CONNECTION_URL, NODE_ENV } = require('./config');
 const { Server } = require('socket.io');
 const socketConnection = require('./socket');
 const { MongoClient } = require('mongodb');
@@ -10,7 +10,7 @@ const server = require('http').createServer(app);
 const Redis = require('ioredis')
 const { createAdapter } = require('socket.io-redis');
 
-const redisClient = new Redis()
+const redisClient = new Redis(NODE_ENV !=='developmemnt' && REDIS_CONNECTION_URL)
 
 const IO = new Server(server, {
   cors: {
