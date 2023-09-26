@@ -10,7 +10,7 @@ const server = require('http').createServer(app);
 const Redis = require('ioredis')
 const { createAdapter } = require('socket.io-redis');
 
-const redisClient = new Redis(NODE_ENV !=='developmemnt' && REDIS_CONNECTION_URL)
+const redisClient = new Redis(NODE_ENV !== 'development' ? REDIS_CONNECTION_URL : null);
 
 const IO = new Server(server, {
   cors: {
