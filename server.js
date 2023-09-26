@@ -1,31 +1,37 @@
-
-const { mongoOptions, envVariables } = require('./constants');
-const { PORT, MONGODB_USERNAME, MONGODB_PASSWORD, NODE_ENV, APP_NAME} = envVariables;
-
-const http = require('http');
-
-const app = require('./config/app');
-const server = http.createServer(app);
-
+const { PORT } = require('./config');
 const { Server } = require('socket.io');
+const socketConnection = require('./socket');
+const { MongoClient } = require('mongodb');
+const dbConnection = require('./database/connection');
+const app = require('./src/app');
 
-const socket = require('./socket')
-const connect = require('./database');
+const server = require('http').createServer(app);
 
-const io = new Server(server);
+const Redis = require('ioredis')
+const { createAdapter } = require('socket.io-redis');
 
-socket(io);
+const redisClient = new Redis()
 
-const uri = NODE_ENV === 'development' ? 
-'mongodb://localhost:27017/crime' :
-`mongodb+srv://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@cluster0.kr6st.mongodb.net/${APP_NAME}?retryWrites=true&w=majority`;
-
-connect(uri, mongoOptions).then(
-  () => {
-    server.listen(PORT || 3000, () => {
-      console.log('Server started on port 3000');
-    });
-    console.log('connected to database')    
+const IO = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ['GET', 'POST']
   },
-  err => console.log(err)
-);
+  adapter: createAdapter({
+    pubClient: redisClient,
+    subClient: redisClient.duplicate()
+  })
+});
+
+socketConnection(IO, redisClient);
+
+dbConnection(MongoClient)
+.then((result) => {
+  console.log(result);
+}).catch((err) => {
+  console.log(err)
+});
+
+server.listen(PORT, () => {
+  console.log(`Server started on PORT ${PORT}`);
+})
