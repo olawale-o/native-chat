@@ -42,9 +42,9 @@ const handler = require('./handler');
   router.get('/:id', async (req, res, next) => {
     const { id } = req.params;
     try {
-      const contacts = await User.find({ _id: { $ne: ObjectID(id) } }).limit(10).toArray();
+      const data = await User.findOne({ _id: ObjectID(id) });
       return res.status(200).json({
-        contacts,
+        data,
       })
     } catch (error) {
       console.log(error);
