@@ -5,6 +5,8 @@ const { InMemmoryStore, RedisSessionStorage } = require('./sessionStorage');
 const { LOCAL_MONGODB_SINGLESET } = require('../config');
 const client = new MongoClient(LOCAL_MONGODB_SINGLESET);
 
+const { getContacts } = require('../src/user/services/Follower');
+
 const memoryStorage = new InMemoryMessageStorage();
 
 const mongoStorage = new MongoDBMessageStorage(client);
@@ -99,31 +101,31 @@ module.exports = function(IO, redisClient) {
       online: true,
     })
     await socket.join(socket.userId);
-    const users = []
-    const userMessages = await getMessagesForUserFromRedisStore(socket.userId) // getMessagesForUser(socket.userId) //await getMessagesForUserFromMongoDB(socket.userId)
-    const dbUsers = await fetchUsersFromDB(socket.userId)
+    // const users = [];
+    // const userMessages = await getMessagesForUserFromRedisStore(socket.userId) // getMessagesForUser(socket.userId) //await getMessagesForUserFromMongoDB(socket.userId)
+    // const dbUsers = await fetchUsersFromDB(socket.userId)
 
-    for (const user of dbUsers) {
-      const u = await redisSession.findSession(user._id.toString())
-      if (u === null) {
-        users.push({
-          userId: user._id,
-          username: user.username,
-          online: user.online,
-          _id: user._id,
-          messages: userMessages.get(user._id.toString()) || [],
-        })
-      } else {
-        users.push({
-          userId: u?.userId,
-          username: u?.username,
-          online: u?.online,
-          _id: u?._id,
-          messages: userMessages.get(user._id.toString()) || [],
-        })
-      }
-    }
-  
+    // for (const user of dbUsers) {
+    //   const u = await redisSession.findSession(user._id.toString())
+    //   if (u === null) {
+    //     users.push({
+    //       userId: user._id,
+    //       username: user.username,
+    //       online: user.online,
+    //       _id: user._id,
+    //       messages: userMessages.get(user._id.toString()) || [],
+    //     })
+    //   } else {
+    //     users.push({
+    //       userId: u?.userId,
+    //       username: u?.username,
+    //       online: u?.online,
+    //       _id: u?._id,
+    //       messages: userMessages.get(user._id.toString()) || [],
+    //     })
+    //   }
+    // }
+    const users = await getContacts({userId: socket.userId});
     await socket.emit('session', {
       sessionId: socket.sessionId,
       userId: socket.userId,
@@ -160,13 +162,13 @@ module.exports = function(IO, redisClient) {
       })
     });
 
-    socket.on('user messages', async ({ _id, username }) => {
+    socket.on('user messages', async ({ userId, username }) => {
       const userMessages = await getMessagesForUserFromRedisStore(socket._id); // await getMessagesForUserFromMongoDB(socket._id) // getMessagesForUser(socket._id);
       socket.emit('user messages', {
-        userId: _id,
-        _id,
+        userId,
+        _id: userId,
         username,
-        messages: userMessages.get(_id) || []
+        messages: userMessages.get(userId) || []
       })
     });
 

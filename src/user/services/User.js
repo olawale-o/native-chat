@@ -16,7 +16,7 @@ const register = async (credentials) => {
 
 const login = async (credentials) => {
   const { username } = credentials;
-  return await User.findOne({ username, $comment: "Find user by username" });
+  return (await User.findOneAndUpdate({ username, $comment: "Find user by username" }, { $set: { online: true } })).value;
 };
 
 module.exports = {
