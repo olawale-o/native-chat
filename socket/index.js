@@ -172,16 +172,16 @@ module.exports = function(IO, redisClient) {
       })
     });
 
-    socket.on('follow', async (followee, followerId) => {
-      await socket.to(followee?._id).emit('follow', followerId);
+    socket.on('follow', async (followee, follower) => {
+      await socket.to(followee?._id).emit('follow', { followee, follower });
       // await redisMessageStorage.followUser(followerId, followee?._id);
-      await mongoStorage.followUser(followerId, followee?._id);
+      await mongoStorage.followUser(follower?._id, followee?._id);
     });
 
-    socket.on('unfollow', async (followee, followerId) => {
-      await socket.to(followee?._id).emit('unfollow', followerId);
+    socket.on('unfollow', async (followee, follower) => {
+      await socket.to(followee?._id).emit('unfollow', { followee, follower });
       // await redisMessageStorage.unFollowUser(followerId, followee?._id);
-      await mongoStorage.unFollowUser(followerId, followee?._id);
+      await mongoStorage.unFollowUser(follower?._id, followee?._id);
     });
 
     socket.on('disconnect', async () => {
