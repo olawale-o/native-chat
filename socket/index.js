@@ -6,6 +6,7 @@ const { LOCAL_MONGODB_SINGLESET } = require('../config');
 const client = new MongoClient(LOCAL_MONGODB_SINGLESET);
 
 const { getContacts } = require('../src/user/services/Follower');
+const { disconnect } = require("../src/user/services/User");
 
 const memoryStorage = new InMemoryMessageStorage();
 
@@ -191,13 +192,14 @@ module.exports = function(IO, redisClient) {
         socket.broadcast.emit('user disconnected', {
           userId: socket.userId,
           username: socket.username,
-        })
-        await redisSession.saveSession(socket.sessionId, {
+        });
+        await redisSession.saveSession(socket.userId, {
           userId: socket.userId,
           username: socket.username,
           online: false,
           _id: socket._id
-        })
+        });
+        await disconnect(socket.userId);
       }
     });
   })

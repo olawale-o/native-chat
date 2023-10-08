@@ -1,5 +1,5 @@
 const { LOCAL_MONGODB_SINGLESET } = require('../../../config');
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectId } = require('mongodb');
 
 const client = new MongoClient(LOCAL_MONGODB_SINGLESET);
 
@@ -19,7 +19,16 @@ const login = async (credentials) => {
   return (await User.findOneAndUpdate({ username, $comment: "Find user by username" }, { $set: { online: true } })).value;
 };
 
+const find = async (userId) => {
+  return await User.findOne({ _id: ObjectId(userId) });
+}
+
+const disconnect = async (userId) => {
+  return await User.findOneAndUpdate({ _id: ObjectId(userId) },  { $set: { online: false } });
+}
+
 module.exports = {
   login,
-  register
+  register,
+  disconnect
 };

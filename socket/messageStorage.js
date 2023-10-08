@@ -48,7 +48,7 @@ class RedisMessageStorage extends MessageStorage {
 
   async followUser(followerId, followeeId) {
     await this.redisClient
-    .multi( )
+    .multi()
     .zadd(`user:${followeeId}:followers`, Math.ceil(new Date() / 1000), followerId)
     .zadd(`user:${followerId}:following`, Math.ceil(new Date() / 1000), followeeId)
     .exec()
