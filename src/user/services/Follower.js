@@ -19,6 +19,15 @@ const followers = async (credentials) => {
       }
     },
     { $unwind: { path: "$connection", } },
+    {
+      $project: {
+        _id: "$connection._id",
+        fullname: '$connection.fullname',
+        username: '$connection.username',
+        online: "$connection.online",
+        avatar: '$connection.avatar'
+      }
+    }
   ]).toArray();
   return users;
 }
