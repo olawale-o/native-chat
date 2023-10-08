@@ -30,5 +30,6 @@ const disconnect = async (userId) => {
 module.exports = {
   login,
   register,
-  disconnect
+  disconnect,
+  find
 };

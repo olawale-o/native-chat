@@ -6,7 +6,7 @@ const { LOCAL_MONGODB_SINGLESET } = require('../config');
 const client = new MongoClient(LOCAL_MONGODB_SINGLESET);
 
 const { getContacts } = require('../src/user/services/Follower');
-const { disconnect } = require("../src/user/services/User");
+const { find, disconnect } = require("../src/user/services/User");
 
 const memoryStorage = new InMemoryMessageStorage();
 
@@ -77,6 +77,7 @@ module.exports = function(IO, redisClient) {
         socket.userId = session.userId;
         socket._id = session.userId;
         socket.username = session.username;
+        socket.avatar = session.avatar;
         return next();
       } else {
         return next(new Error("Invalid session"))
@@ -87,10 +88,12 @@ module.exports = function(IO, redisClient) {
      return next(new Error('invalid user details'));
     }
     // console.log('line 69', user);
-    socket.username = user.username;
-    socket.userId = user._id;
-    socket._id = user._id;
-    socket.sessionId = user._id;
+    const newUser = await find(user._id); 
+    socket.username = newUser.username;
+    socket.userId = newUser._id;
+    socket._id = newUser._id;
+    socket.sessionId = newUser._id;
+    socket.avatar = newUser.avatar
     next()
   })
 
@@ -100,6 +103,7 @@ module.exports = function(IO, redisClient) {
       username: socket.username,
       _id: socket.userId,
       online: true,
+      avatar: socket.avatar,
     })
     await socket.join(socket.userId);
     // const users = [];
@@ -133,6 +137,7 @@ module.exports = function(IO, redisClient) {
       username: socket.username,
       _id: socket._id,
       online: true,
+      avatar: socket.avatar,
     });
     // all connected users except current user
     await socket.emit("users", users);
@@ -197,7 +202,8 @@ module.exports = function(IO, redisClient) {
           userId: socket.userId,
           username: socket.username,
           online: false,
-          _id: socket._id
+          _id: socket._id,
+          avatar: socket.avatar
         });
         await disconnect(socket.userId);
       }
