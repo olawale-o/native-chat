@@ -48,15 +48,15 @@ class RedisMessageStorage extends MessageStorage {
 
   async followUser(followerId, followeeId) {
     await this.redisClient
-    .multi()
-    .rpush(`user:${followeeId}:followers`, followerId)
-    .rpush(`user:${followerId}:following`, followeeId)
+    .multi( )
+    .zadd(`user:${followeeId}:followers`, Math.ceil(new Date() / 1000), followerId)
+    .zadd(`user:${followerId}:following`, Math.ceil(new Date() / 1000), followeeId)
     .exec()
   }
 
   async unFollowUser(followerId, followeeId) {
     await this.redisClient
-    .rpop(`user:${followerId}:following`, followeeId)
+    .zrem(`user:${followerId}:following`, followeeId)
     .exec();
   }
 
@@ -88,6 +88,7 @@ class MongoDBMessageStorage extends MessageStorage {
         start: new Date(),
         end: new Date(),
         last: new Date(),
+        time: Math.ceil(new Date() / 1000)
       }),
       await this.mongoClient.db('socialdb')
       .collection('following')
@@ -99,6 +100,7 @@ class MongoDBMessageStorage extends MessageStorage {
         start: new Date(),
         end: new Date(),
         last: new Date(),
+        time: Math.ceil(new Date() / 1000)
       }),
       await this.mongoClient.db('socialdb')
       .collection("activities")

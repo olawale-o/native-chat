@@ -12,9 +12,11 @@ const { createAdapter } = require('socket.io-redis');
 
 const redisClient = new Redis(NODE_ENV !== 'development' ? REDIS_CONNECTION_URL : null);
 
+const origin = NODE_ENV !== 'development' ? 'witter-chat.vercel.app': 'http://localhost:3000';
+
 const IO = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin,
     methods: ['GET', 'POST']
   },
   adapter: createAdapter({
