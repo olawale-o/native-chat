@@ -1,4 +1,4 @@
-const { LOCAL_MONGODB_SINGLESET, NODE_ENV } = require('../../../config');
+const { LOCAL_MONGODB_SINGLESET, NODE_ENV, REDIS_CONNECTION_URL } = require('../../../config');
 const { ObjectID } = require('bson');
 const { MongoClient } = require('mongodb');
 
