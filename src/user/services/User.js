@@ -1,5 +1,6 @@
 const { LOCAL_MONGODB_SINGLESET } = require('../../../config');
 const { MongoClient, ObjectId } = require('mongodb');
+const Crypto = require('../../lib/crypto');
 
 const client = new MongoClient(LOCAL_MONGODB_SINGLESET);
 
