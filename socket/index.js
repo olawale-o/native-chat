@@ -90,9 +90,9 @@ module.exports = function(IO, redisClient) {
     // console.log('line 69', user);
     const newUser = await find(user._id); 
     socket.username = newUser.username;
-    socket.userId = newUser._id;
-    socket._id = newUser._id;
-    socket.sessionId = newUser._id;
+    socket.userId = newUser._id.toString();
+    socket._id = newUser._id.toString();
+    socket.sessionId = newUser._id.toString();
     socket.avatar = newUser.avatar
     next()
   })
@@ -135,7 +135,7 @@ module.exports = function(IO, redisClient) {
       sessionId: socket.sessionId,
       userId: socket.userId,
       username: socket.username,
-      _id: socket._id,
+      _id: socket._id.toString(),
       online: true,
       avatar: socket.avatar,
     });
@@ -148,16 +148,17 @@ module.exports = function(IO, redisClient) {
       sessionId: socket.sessionId,
       _id: socket._id,
     });
-    socket.on('private message', async ({ text, to }) => {
+    socket.on('private message', async ({ message, to, type }) => {
       const newMessage = {
         from: socket.userId,
         to,
-        text,
+        message,
+        type,
         username: socket.username
       }
       socket.to(to).emit("private message", newMessage);
-      await redisMessageStorage.saveMessage({ from: ObjectId(socket.userId), to: ObjectId(to), text });
-      await mongoStorage.saveMessage({ from: ObjectId(socket.userId), to: ObjectId(to), text })
+      await redisMessageStorage.saveMessage({ from: ObjectId(socket.userId), to: ObjectId(to), message, type });
+      await mongoStorage.saveMessage({ from: ObjectId(socket.userId), to: ObjectId(to), message, type })
     })
 
     socket.on('new message', (message) => {
