@@ -1,13 +1,20 @@
-const { LOCAL_MONGODB_SINGLESET } = require('../../../config');
+const { LOCAL_MONGODB_SINGLESET, NODE_ENV, REDIS_CONNECTION_URL } = require('../../../config');
 const { ObjectID } = require('bson');
 const { MongoClient } = require('mongodb');
 
 const client = new MongoClient(LOCAL_MONGODB_SINGLESET);
 
+const Redis = require('ioredis')
+
+const redisClient = new Redis(NODE_ENV !== 'development' ? REDIS_CONNECTION_URL : null);
+
 const Follower = client.db('socialdb').collection('followers');
+const User = client.db('socialdb').collection('users');
 
 const followers = async (credentials) => {
   const { userId } = credentials;
+  // const union = await redisClient.zunion(2, `user:${userId}:followers`, `user:${userId}:following`);
+  // const unionId = union.map((id) => ObjectID(id));
   const users = await Follower.aggregate([
     { $match: { followeeId: ObjectID(userId), $comment: "User followers" } },
     {
@@ -29,6 +36,8 @@ const followers = async (credentials) => {
       }
     }
   ]).toArray();
+  //const contacts = await User.find( { _id: { $in: unionId } }, { _id: 0 } ).toArray();
+  // console.log(contacts);
   return users;
 }
 const getContacts = async ({ userId }) => {

@@ -12,10 +12,12 @@ const FollowingService = require('./services/Following');
 
 const register = async (req, res, next) => {
   try {
-    const { newUser, userId } = await UserService.register(req.body);
-    return res.status(200).json({
-      ...newUser,
-      id: userId,
+    const { user, status, message } = await UserService.register(req.body);
+    return res.status(status).json({
+      data: {
+        user
+      },
+      message
     })
   } catch (error) {
     console.log(error);
@@ -24,8 +26,12 @@ const register = async (req, res, next) => {
 
 const login = async (req, res, next) => {
   try {
-    const user = await UserService.login(req.body);
-    return res.status(200).json({user,})
+    const { status, user } = await UserService.login(req.body);
+    return res.status(status).json({
+      data: {
+        user
+      }
+    })
   } catch (error) {
     console.log(error);
   }
