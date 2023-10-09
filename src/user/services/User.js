@@ -6,17 +6,46 @@ const client = new MongoClient(LOCAL_MONGODB_SINGLESET);
 const User = client.db('socialdb').collection('users');
 
 const register = async (credentials) => {
-  const { name, username } = credentials;
-  const newUser = { name, username, createdAt: new Date(), updatedAt: new Date(), };
-  const userId = await User.insertOne(newUser);
-  return {
-    newUser, userId
-  };
+  try {
+    const { email, username, password } = credentials;
+    const isFound = await User.findOne({ $or: [ { email },  { username}] });
+
+    if (isFound) {
+      return { status: 409, message: 'Kindly login with your credentials' };
+    }
+    const hashedPassword = Crypto.encryptData(password);
+    const create = (await User.insertOne({ email, username, password: hashedPassword })).insertedId;
+    if (!create) {
+      return { status: 400, message: 'Bad Request' };
+    }
+    return { status: 201, message: 'Account created' };
+  } catch (error) {
+    return { status: 500, messadge: 'Internal Server Error' };
+  }
 }
 
 const login = async (credentials) => {
-  const { username } = credentials;
-  return (await User.findOneAndUpdate({ username, $comment: "Find user by username" }, { $set: { online: true } })).value;
+  try {
+    const { username, password } = credentials;
+    const isFound = await User.findOne({ $or: [ { email: username }, { username}] });
+
+    if (!isFound) {
+      return { status: 404, message: 'Please enter a valid credentials' };
+    }
+
+    const decrypted = Crypto.decryptData(isFound.password);
+    if (password !== decrypted) {
+      return { status: 403, message: 'Please enter a valid credentials to login' };
+    }
+    const user = await User.findOneAndUpdate({ username, $comment: "Find user by username" }, { $set: { online: true } }).value;
+    return {
+      status: 200,
+      message: 'Login successful',
+      user
+    };
+  } catch (error) {
+    return { status: 500, messadge: 'Internal Server Error' };
+  }
 };
 
 const find = async (userId) => {
