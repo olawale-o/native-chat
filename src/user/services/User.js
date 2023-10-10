@@ -1,10 +1,10 @@
-const { REMOTE_MONGODB_REPLSET, LOCAL_DATABASE_NAME, REMOTE_DATABASE_NAME, NODE_ENV } = require('../../../config');
+const { LOCAL_MONGODB_SINGLESET, LOCAL_DATABASE_NAME, REMOTE_DATABASE_NAME, NODE_ENV } = require('../../../config');
 const { MongoClient, ObjectId } = require('mongodb');
 const Crypto = require('../../lib/crypto');
 
 const DB_NAME = NODE_ENV !== 'development' ? REMOTE_DATABASE_NAME : LOCAL_DATABASE_NAME;
 
-const client = new MongoClient(REMOTE_MONGODB_REPLSET);
+const client = new MongoClient(LOCAL_MONGODB_SINGLESET);
 
 const User = client.db(DB_NAME).collection('users');
 

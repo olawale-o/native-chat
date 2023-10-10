@@ -27,12 +27,12 @@ const IO = new Server(server, {
 
 socketConnection(IO, redisClient);
 
-// dbConnection(MongoClient)
-// .then((result) => {
-//   console.log(result);
-// }).catch((err) => {
-//   console.log(err)
-// });
+dbConnection(MongoClient)
+.then((result) => {
+  console.log(result);
+}).catch((err) => {
+  console.log(err)
+});
 
 server.listen(PORT, () => {
   console.log(`Server started on PORT ${PORT}`);
