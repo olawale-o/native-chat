@@ -2,7 +2,7 @@ const { LOCAL_MONGODB_SINGLESET, LOCAL_DATABASE_NAME, REMOTE_DATABASE_NAME, NODE
 const { ObjectID } = require('bson');
 const { MongoClient } = require('mongodb');
 
-const client = new MongoClient(LOCAL_MONGODB_SINGLESET);
+const client = new MongoClient('mongodb+srv://native-chat-main-db-025066a14b7:V81EYyszHSz5hfqGQshw3RYJMeEU37@prod-us-central1-2.ih9la.mongodb.net/native-chat-main-db-025066a14b7');
 
 const DB_NAME = NODE_ENV !== 'development' ? REMOTE_DATABASE_NAME : LOCAL_DATABASE_NAME;
 
