@@ -1,12 +1,16 @@
-const { LOCAL_MONGODB_SINGLESET } = require('../../config');
+const { LOCAL_MONGODB_SINGLESET, NODE_ENV, LOCAL_DATABASE_NAME, REMOTE_DATABASE_NAME } = require('../../config');
 const router = require('express').Router();
 const { ObjectID } = require('bson');
 const { MongoClient } = require('mongodb');
 
+const DB_NAME = NODE_ENV !== 'development' ? REMOTE_DATABASE_NAME : LOCAL_DATABASE_NAME;
+
 const client = new MongoClient(LOCAL_MONGODB_SINGLESET);
 
-const User = client.db('socialdb').collection('users');
-const Friend = client.db('socialdb').collection('friends');
+
+
+const User = client.db(DB_NAME).collection('users');
+const Friend = client.db(DB_NAME).collection('friends');
 
 const handler = require('./handler');
 

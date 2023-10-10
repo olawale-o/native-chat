@@ -1,8 +1,10 @@
+const { LOCAL_MONGODB_SINGLESET, LOCAL_DATABASE_NAME, REMOTE_DATABASE_NAME, NODE_ENV } = require('../config');
 const { MongoClient, ObjectId } = require('mongodb');
 
 const { MongoDBMessageStorage, InMemoryMessageStorage, RedisMessageStorage } = require('./messageStorage');
 const { InMemmoryStore, RedisSessionStorage } = require('./sessionStorage');
-const { LOCAL_MONGODB_SINGLESET } = require('../config');
+
+const DB_NAME = NODE_ENV !== 'development' ? REMOTE_DATABASE_NAME : LOCAL_DATABASE_NAME;
 const client = new MongoClient(LOCAL_MONGODB_SINGLESET);
 
 const { getContacts } = require('../src/user/services/Follower');
@@ -14,7 +16,7 @@ const mongoStorage = new MongoDBMessageStorage(client);
 
 // const memorySession = new InMemmoryStore();
 
-const User = client.db('socialdb').collection('users');
+const User = client.db(DB_NAME).collection('users');
 
 const fetchUsersFromDB = async (userId) => {
   return await User.find({ _id: { $ne: ObjectId(userId) }}).toArray();

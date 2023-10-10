@@ -1,14 +1,15 @@
-const { LOCAL_MONGODB_SINGLESET, NODE_ENV, REDIS_CONNECTION_URL } = require('../../../config');
+const { LOCAL_MONGODB_SINGLESET, NODE_ENV, REDIS_CONNECTION_URL, LOCAL_DATABASE_NAME, REMOTE_DATABASE_NAME } = require('../../../config');
 const { ObjectID } = require('bson');
 const { MongoClient } = require('mongodb');
+const Redis = require('ioredis');
 
 const client = new MongoClient(LOCAL_MONGODB_SINGLESET);
 
-const Redis = require('ioredis')
+const DB_NAME = NODE_ENV !== 'development' ? REMOTE_DATABASE_NAME : LOCAL_DATABASE_NAME;
 
 const redisClient = new Redis(NODE_ENV !== 'development' ? REDIS_CONNECTION_URL : null);
 
-const Following = client.db('socialdb').collection('following');
+const Following = client.db(DB_NAME).collection('following');
 
 const following = async (credentials) => {
   const { userId } = credentials;

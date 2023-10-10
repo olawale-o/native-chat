@@ -1,10 +1,12 @@
-const { LOCAL_MONGODB_SINGLESET } = require('../../config');
+const { LOCAL_MONGODB_SINGLESET, LOCAL_DATABASE_NAME, REMOTE_DATABASE_NAME, NODE_ENV } = require('../../config');
 const { ObjectID } = require('bson');
 const { MongoClient } = require('mongodb');
 
 const client = new MongoClient(LOCAL_MONGODB_SINGLESET);
 
-const User = client.db('socialdb').collection('users');
+const DB_NAME = NODE_ENV !== 'development' ? REMOTE_DATABASE_NAME : LOCAL_DATABASE_NAME;
+
+const User = client.db(DB_NAME).collection('users');
 
 const UserService = require('./services/User');
 const FollowerService = require('./services/Follower');

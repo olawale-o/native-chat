@@ -1,10 +1,12 @@
-const { LOCAL_MONGODB_SINGLESET } = require('../../../config');
+const { REMOTE_MONGODB_REPLSET, LOCAL_DATABASE_NAME, REMOTE_DATABASE_NAME, NODE_ENV } = require('../../../config');
 const { MongoClient, ObjectId } = require('mongodb');
 const Crypto = require('../../lib/crypto');
 
-const client = new MongoClient(LOCAL_MONGODB_SINGLESET);
+const DB_NAME = NODE_ENV !== 'development' ? REMOTE_DATABASE_NAME : LOCAL_DATABASE_NAME;
 
-const User = client.db('socialdb').collection('users');
+const client = new MongoClient(REMOTE_MONGODB_REPLSET);
+
+const User = client.db(DB_NAME).collection('users');
 
 const register = async (credentials) => {
   try {
@@ -49,6 +51,7 @@ const register = async (credentials) => {
       }
     };
   } catch (error) {
+    console.log(error);
     return { status: 500, messadge: 'Internal Server Error' };
   }
 }

@@ -1,4 +1,7 @@
+const { NODE_ENV, LOCAL_DATABASE_NAME, REMOTE_DATABASE_NAME } = require('../config');
 const { ObjectId } = require('mongodb');
+
+const DB_NAME = NODE_ENV !== 'development' ? REMOTE_DATABASE_NAME : LOCAL_DATABASE_NAME;
 
 class MessageStorage {
   saveMessage(message) {}
@@ -78,7 +81,7 @@ class MongoDBMessageStorage extends MessageStorage {
 
   async _followUser(followerId, followeeId) {
     Promise.all([
-      await this.mongoClient.db('socialdb')
+      await this.mongoClient.db(DB_NAME)
       .collection('followers')
       .insertOne({
         followeeId: ObjectId(followeeId),
@@ -90,7 +93,7 @@ class MongoDBMessageStorage extends MessageStorage {
         last: new Date(),
         time: Math.ceil(new Date() / 1000)
       }),
-      await this.mongoClient.db('socialdb')
+      await this.mongoClient.db(DB_NAME)
       .collection('following')
       .insertOne({
         followeeId: ObjectId(followeeId),
@@ -102,7 +105,7 @@ class MongoDBMessageStorage extends MessageStorage {
         last: new Date(),
         time: Math.ceil(new Date() / 1000)
       }),
-      await this.mongoClient.db('socialdb')
+      await this.mongoClient.db(DB_NAME)
       .collection("activities")
       .insertOne({
         actorId: ObjectId(followerId),
@@ -118,12 +121,12 @@ class MongoDBMessageStorage extends MessageStorage {
 
   async _unFollowUser(followerId, followeeId) {
     Promise.all([
-      this.mongoClient.db('socialdb')
+      this.mongoClient.db(DB_NAME)
       .collection('following').deleteOne({
         followerId: ObjectId(followerId),
         followeeId: ObjectId(followeeId) 
       }),
-      this.mongoClient.db('socialdb')
+      this.mongoClient.db(DB_NAME)
       .collection('followers').deleteOne({
         followerId: ObjectId(followerId),
         followeeId: ObjectId(followeeId) 
@@ -132,7 +135,7 @@ class MongoDBMessageStorage extends MessageStorage {
   }
 
   async _saveMessagesToDB(message){
-    await this.mongoClient.db('socialdb').collection('conversations').insertOne({
+    await this.mongoClient.db(DB_NAME).collection('conversations').insertOne({
       ...message,
       createdAt: new Date(),
       updatedAt: new Date()
@@ -140,7 +143,7 @@ class MongoDBMessageStorage extends MessageStorage {
   }
 
   async _findMessagesForUserFromDB (userId){
-    return await this.mongoClient.db('socialdb')
+    return await this.mongoClient.db(DB_NAME)
     .collection('conversations')
     .find({ $or: [{ from: ObjectId(userId) }, {to: ObjectId(userId) }] })
     .toArray();
