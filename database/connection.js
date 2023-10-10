@@ -3,6 +3,7 @@ const { LOCAL_MONGODB_SINGLESET, NODE_ENV, LOCAL_DATABASE_NAME, REMOTE_DATABASE_
 const DB_NAME = NODE_ENV !== 'development' ? REMOTE_DATABASE_NAME : LOCAL_DATABASE_NAME;
 
 module.exports = async function(client) {
+  console.log(LOCAL_MONGODB_SINGLESET);
   return client.connect(LOCAL_MONGODB_SINGLESET)
   .then((client) => {
     const db = client.db(DB_NAME);
