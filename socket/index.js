@@ -194,7 +194,6 @@ module.exports = function(IO, redisClient) {
     });
 
     socket.on('disconnect', async () => {
-      console.log('disconnect');
       const matchingSockets = await IO.in(socket.userId).allSockets();
       const isDisconnected = matchingSockets.size === 0;
       if (isDisconnected) {
