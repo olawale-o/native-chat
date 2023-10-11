@@ -59,6 +59,7 @@ class RedisMessageStorage extends MessageStorage {
 
   async unFollowUser(followerId, followeeId) {
     await this.redisClient
+    .multi()
     .zrem(`user:${followerId}:following`, followeeId)
     .exec();
   }

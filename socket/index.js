@@ -95,8 +95,8 @@ module.exports = function(IO, redisClient) {
     socket.userId = newUser._id.toString();
     socket._id = newUser._id.toString();
     socket.sessionId = newUser._id.toString();
-    socket.avatar = newUser.avatar
-    next()
+    socket.avatar = newUser.avatar;
+    next();
   })
 
   IO.on('connection', async (socket) => {
@@ -194,6 +194,7 @@ module.exports = function(IO, redisClient) {
     });
 
     socket.on('disconnect', async () => {
+      console.log('disconnect');
       const matchingSockets = await IO.in(socket.userId).allSockets();
       const isDisconnected = matchingSockets.size === 0;
       if (isDisconnected) {
