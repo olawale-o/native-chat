@@ -15,10 +15,14 @@ const FollowingService = require('./services/Following');
 const register = async (req, res, next) => {
   try {
     const { user, status, message } = await UserService.register(req.body);
+    if (status > 201) {
+      return res.status(status).json({
+        status,
+        message
+      });
+    }
     return res.status(status).json({
-      data: {
-        user
-      },
+      data: {user},
       message
     })
   } catch (error) {
@@ -28,11 +32,16 @@ const register = async (req, res, next) => {
 
 const login = async (req, res, next) => {
   try {
-    const { status, user } = await UserService.login(req.body);
+    const { status, user, message } = await UserService.login(req.body);
+    if (status > 200) {
+      return res.status(status).json({
+        status,
+        message
+      });
+    }
     return res.status(status).json({
-      data: {
-        user
-      }
+      data: {user},
+      message
     })
   } catch (error) {
     console.log(error);

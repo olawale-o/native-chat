@@ -62,12 +62,12 @@ const login = async (credentials) => {
     const isFound = await User.findOne({ $or: [ { email: username }, { username}] });
 
     if (!isFound) {
-      return { status: 404, message: 'Please enter a valid credentials' };
+      return { status: 404, message: 'Please provide valid credentials' };
     }
 
     const decrypted = Crypto.decryptData(isFound.password);
     if (password !== decrypted) {
-      return { status: 403, message: 'Please enter a valid credentials to login' };
+      return { status: 403, message: 'Please provide valid credentials to login' };
     }
     const data = await User.findOneAndUpdate({
       username,
