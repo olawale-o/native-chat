@@ -15,34 +15,41 @@ const User = client.db(DB_NAME).collection('users');
 
 const followers = async (credentials) => {
   const { userId } = credentials;
-  // const union = await redisClient.zunion(2, `user:${userId}:followers`, `user:${userId}:following`);
-  // const unionId = union.map((id) => ObjectID(id));
-  const users = await Follower.aggregate([
-    { $match: { followeeId: ObjectID(userId), $comment: "User followers" } },
-    {
-      $lookup: {
-        from: "users",
-        localField: "followerId",
-        foreignField: "_id",
-        as: "connection",
-      }
-    },
-    { $unwind: { path: "$connection", } },
-    {
-      $project: {
-        _id: "$connection._id",
-        fullname: '$connection.fullname',
-        username: '$connection.username',
-        online: "$connection.online",
-        avatar: '$connection.avatar'
-      }
-    }
-  ]).toArray();
-  //const contacts = await User.find( { _id: { $in: unionId } }, { _id: 0 } ).toArray();
-  // console.log(contacts);
+
+  const followers = await redisClient.zrange(`user:${userId}:followers`, 0, -1,);
+
+  const followersIds = followers.map((id) => ObjectID(id));
+
+  const users = await User.find({_id: { $in: followersIds } },
+  ).project({ name: 1, username: 1, online: 1, avatar: 1}).toArray();
+
+  // const users = await Follower.aggregate([
+  //   { $match: { followeeId: ObjectID(userId), $comment: "User followers" } },
+  //   {
+  //     $lookup: {
+  //       from: "users",
+  //       localField: "followerId",
+  //       foreignField: "_id",
+  //       as: "connection",
+  //     }
+  //   },
+  //   { $unwind: { path: "$connection", } },
+  //   {
+  //     $project: {
+  //       _id: "$connection._id",
+  //       fullname: '$connection.fullname',
+  //       username: '$connection.username',
+  //       online: "$connection.online",
+  //       avatar: '$connection.avatar'
+  //     }
+  //   }
+  // ]).toArray();
+
   return users;
 }
 const getContacts = async ({ userId }) => {
+    // const union = await redisClient.zunion(2, `user:${userId}:followers`, `user:${userId}:following`);
+  // const unionId = union.map((id) => ObjectID(id));
   const contacts = await Follower.aggregate([
     { $match: {followeeId: ObjectID(userId)} },
     { 
@@ -87,6 +94,8 @@ const getContacts = async ({ userId }) => {
       }
     }
   ]).toArray();
+    //const contacts = await User.find( { _id: { $in: unionId } }, { _id: 0 } ).toArray();
+  // console.log(contacts);
   return contacts;
 }
 module.exports = {
