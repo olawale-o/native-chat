@@ -41,9 +41,9 @@ class RedisMessageStorage extends MessageStorage {
     .exec();
   }
   
-  async findMessagesForUser(userId) {
+  async findMessagesForUser(userId, start = 0, end = -1) {
     return this.redisClient
-    .lrange(`messages:${userId}`, 0, -1)
+    .lrange(`messages:${userId}`, start, end)
     .then((results) => {
       return results.map((res) => JSON.parse(res))
     })
