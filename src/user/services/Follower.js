@@ -48,54 +48,71 @@ const followers = async (credentials) => {
   return users;
 }
 const getContacts = async ({ userId }) => {
-    // const union = await redisClient.zunion(2, `user:${userId}:followers`, `user:${userId}:following`);
-  // const unionId = union.map((id) => ObjectID(id));
-  const contacts = await Follower.aggregate([
-    { $match: {followeeId: ObjectID(userId)} },
-    { 
-      $lookup: { 
-        from: "users",
-        localField: "followerId",
-        foreignField: "_id",
-        as: "details"
-      } 
-    },
-    { $unionWith: {
-      coll:  "following",
-      pipeline: [
-        {$match: {followerId: ObjectID(userId)}},
-        { 
-          $lookup: { 
-            from: "users",
-            localField: "followeeId",
-            foreignField: "_id",
-            as: "details"
-          } 
-        },
-      ]
-    } },
-    {
-      $unwind: "$details"
-    },
-    {
-      $group: {
-        _id: "$details"
-      }
-    },
+  const union = await redisClient.zunion(2, `user:${userId}:followers`, `user:${userId}:following`);
+  const unionIds = union.map((id) => ObjectID(id));
+  // const contacts = await Follower.aggregate([
+  //   { $match: {followeeId: ObjectID(userId)} },
+  //   { 
+  //     $lookup: { 
+  //       from: "users",
+  //       localField: "followerId",
+  //       foreignField: "_id",
+  //       as: "details"
+  //     } 
+  //   },
+  //   { $unionWith: {
+  //     coll:  "following",
+  //     pipeline: [
+  //       {$match: {followerId: ObjectID(userId)}},
+  //       { 
+  //         $lookup: { 
+  //           from: "users",
+  //           localField: "followeeId",
+  //           foreignField: "_id",
+  //           as: "details"
+  //         } 
+  //       },
+  //     ]
+  //   } },
+  //   {
+  //     $unwind: "$details"
+  //   },
+  //   {
+  //     $group: {
+  //       _id: "$details"
+  //     }
+  //   },
+  //   {
+  //     $project: {
+  //       _id: 0,
+  //       userId: "$_id._id",
+  //       username: "$_id.username",
+  //       email: "$_id.email",
+  //       avatar: "$_id.avatar",
+  //       fullname: "$_id.fullname",
+  //       online: "$_id.online",
+  //     }
+  //   }
+  // ]).toArray();
+  const users = await User.aggregate([
+    {$match: { _id: { $in: unionIds } }},
     {
       $project: {
-        _id: 0,
-        userId: "$_id._id",
-        username: "$_id.username",
-        email: "$_id.email",
-        avatar: "$_id.avatar",
-        fullname: "$_id.fullname",
-        online: "$_id.online",
+        userId: "$_id",
+        avatar: 1,
+        username: 1,
+        fullname: "$name",
+        online: 1
       }
     }
   ]).toArray();
-    //const contacts = await User.find( { _id: { $in: unionId } }, { _id: 0 } ).toArray();
-  // console.log(contacts);
+  const onlineContacts = users.map(async (contact) =>  {
+    const onlineStatus = JSON.parse(await redisClient.hget(`session:${contact.userId}`, "session")).online;
+    contact.online = onlineStatus;
+    return contact;
+  });
+
+  const contacts = await Promise.all(onlineContacts);
   return contacts;
 }
 module.exports = {
