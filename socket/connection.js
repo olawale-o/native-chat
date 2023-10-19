@@ -34,17 +34,18 @@ const onConnect = (options = {}) => {
       _id: socket._id,
     });
     
-    socket.on('private message', async ({ message, to, type }) => {
+    socket.on('private message', async ({ message, to, type, caption }) => {
       const newMessage = {
         from: socket.userId,
         to,
         message,
         type,
-        username: socket.username
+        username: socket.username,
+        caption
       };
       socket.to(to).emit("private message", newMessage);
-      await redisMessageStorage.saveMessage({ from: ObjectId(socket.userId), to: ObjectId(to), message, type });
-      await mongoStorage.saveMessage({ from: ObjectId(socket.userId), to: ObjectId(to), message, type });
+      await redisMessageStorage.saveMessage({ from: ObjectId(socket.userId), to: ObjectId(to), message, type, caption });
+      await mongoStorage.saveMessage({ from: ObjectId(socket.userId), to: ObjectId(to), message, type, caption });
     });
     
     socket.on('new message', (message) => {
